@@ -147,12 +147,10 @@
          
                 axios.post('/users', this.form)
                     .then(response => {
-                        if (response.data.status == 200) {
+                        if (response.data.status == 200) {                            
                             this.$snotify.success('Successfully created', 'Success');
-                            this.form.reset();
-                            this.loader.hide();
-                            //$('.v-error').empty();
-                            //this.$router.push({ name: 'users' });                            
+                            this.$router.push({ name: 'users' });
+                            this.loader.hide();                                                 
                         } else {
                             this.$snotify.error('Something went worng', 'error');
                         }

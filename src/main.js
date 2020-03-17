@@ -8,6 +8,10 @@ import { Form, HasError, AlertError } from 'vform';
 import Snotify, { SnotifyPosition } from 'vue-snotify';
 import Loading from 'vue-loading-overlay';
 import VuePagination from "./components/common/PaginationComponent";
+import VModal from 'vue-js-modal';
+import vSelect from "vue-select";
+ 
+
 
 window.Form = Form
 
@@ -24,6 +28,8 @@ Vue.component(HasError.name, HasError);
 Vue.component(AlertError.name, AlertError);
 Vue.use(Loading);
 Vue.component('v-pagination', VuePagination);
+Vue.use(VModal);
+Vue.component("v-select", vSelect);
 
 const router = new VueRouter({
     routes,

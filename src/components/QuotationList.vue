@@ -6,149 +6,194 @@
                     <strong class="card-title">Quotation List</strong>
                 </div>
                 <div class="card-body">
-                    <router-link tag="a" class="btn btn-sm btn-info" to="/quotation-create">                  
-                        <i class="glyphicon glyphicon-plus "></i> New Quotation
+                    <router-link tag="a" class="btn btn-sm btn-info" to="/quotation-create">
+                        <i class="glyphicon glyphicon-plus"></i> New Quotation
                     </router-link>
-
                     <div class="pull-right m-b-1">
                         <div class="pull-left" style="margin-right: 10px;">
-                            <select class="form-control-sm">
-                                <option value="1">All</option>
-                                <option value="1">Id</option>
-                                <option value="1">Name</option>
-                                <option value="1">Brand</option>
+                            <select v-model="search_field" class="form-control-sm">
+                                <!-- <option value="all">All</option> -->
+                                <option value="id">QID</option>
+                                <option value="vendor_id">To</option>
+                                <option value="subject">Subject</option>
+                                <option value="quotation_date">Quotation Date</option>
                             </select>
                         </div>
                         <div class="pull-left" style="margin-right: 10px;">
-                            <input type="text" class="form-control-sm" id="search-input" name="q" value="">
-                        </div>
-                        <div class="pull-right">
-                            <input type="submit" class="btn btn-sm btn-info search-btn" value="Search">
+                            <input type="text" class="form-control-sm" v-model="search_query"  placeholder="Type here for search">
                         </div>
                     </div>
-                    <hr>
-                    <table class="table table-bordered">
+                    <hr class="list-he">
+                    <table class="reportTable">
                         <thead>
                             <tr>
                                 <th scope="col">SL</th>
                                 <th scope="col">QID</th>
                                 <th scope="col">To</th>
-                                <th scope="col">Total Price</th>
-                                <th scope="col">Venodr</th>
-                                <th scope="col">Date</th>
+                                <th width="33%" scope="col">Subject</th>
+                                <th scope="col">Quotation Date</th>
+                                <th scope="col">Total Discount</th>
+                                <th scope="col">Total Amount</th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(user, index) in users" :key="user.id">
-                               <td>{{ user.first_name }}</td>
-                               <td>{{ user.mobile_no }}</td>
-                               <td>{{ user.mobile_no }}</td>
-                               <td>{{ user.email }}</td>
-                               <td>{{ user.role.name }}</td>
-                               <td>{{ user.mobile_no }}</td>
-                               <td>{{ user.role.name }}</td>
+                            <tr v-for="(quotation, index) in quotations" :key="quotation.id">
+                                <td>{{ ++index }}</td>
+                                <td>{{ quotation.id }}</td>
+                                <td>{{ quotation.vendor.vendor_name }} Mr Amish</td>
+                                <td :title="quotation.subject">{{ quotation.subject | subStr }}</td>
+                                <td>{{ quotation.quotation_date }}</td>                               
+                                <td>{{ quotation.total_discount }}</td>
+                                <td>{{ quotation.total_without_discount }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-success btn-xs" @click="edit(quotation)"><i class="fas fa fa-edit"></i></button>
+                                    <button type="button" class="btn btn-danger btn-xs " @click="deleteQuotation(quotation.id)"><i class="fas fa fa-times"></i></button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
-                    <v-pagination v-if="pagination.last_page > 1"
-                                :pagination="pagination" :offset="5" @paginate="getUsers()">
+                    <v-pagination v-if="pagination.last_page > 1" :pagination="pagination" :offset="5" @paginate="getQuotations()">
                     </v-pagination>
                 </div>
             </div>
         </div>
+        <vue-snotify></vue-snotify>
     </div>
 </template>
-<style>   
-    .m-b-1 {
-        padding-bottom: 15px !important;
-    }
-    table {      
-        margin-bottom: 20px !important;
-    }
-    .form-control-sm {
-        border-radius: 18px !important;
-    }
+<style>
+.m-b-1 {
+    padding-bottom: 15px !important;
+}
+/*
+table {
+    margin-bottom: 20px !important;
+}*/
+
+.form-control-sm {
+    border-radius: 18px !important;
+}
+
+ /*table > thead > tr > th {
+      text-align: center;
+      font-weight: bold;
+      background-color: #01A3A5;
+      color:  #fffef8;    
+  }  */
 </style>
-
 <script>
-  import axios from '../axios';
-  import "vue-loading-overlay/dist/vue-loading.css";
-  import Loading from 'vue-loading-overlay';
-  
-  export default {
+import axios from '../axios';
+import "vue-loading-overlay/dist/vue-loading.css";
+import Loading from 'vue-loading-overlay';
+
+export default {
     data() {
-       return {
-          listResponse: null,
-          users: [],
-          pagination: {
-             current_page: 1,
-            
-          },
-          search_query: '',        
-          /*searchOptions: [
-             {
-                column: 'unique_id',
-                label: 'Unique Id'
-             },
-             {
-                column: 'code',
-                label: 'Code'
-             },
-             {
-                column: 'department',
-                label: 'Department'
-             },
-             {
-                column: 'designation',
-                label: 'Designation'
-             },
-             {
-                column: 'section',
-                label: 'Section'
-             }
-          ],*/
-          searchByField: 'Unique Id',
-          searchByKey: 'unique_id',
-       }
-    },     
+        return {
+            listResponse: null,
+            quotations: [],
+            pagination: {
+                current_page: 1,
 
-    methods: {
-       userDelete(id) {
-          if (window.confirm('Are You Sure?')) {
-             deleteEmployee(id)
-                .then((res) => {
-                   console.log(res);
-                   this.getUsers();
-                })
-                .catch((error) => {
-                   console.log(error);
-                });
-          }
-       },
-
-       getUsers() {
-          const loader = this.$loading.show({
-             container: this.$refs.attendanceTable,
-             canCancel: true,
-             loader: 'bars'
-          })
-          axios.get('users?page='+this.pagination.current_page)
-              .then((res) => {
-                this.users = res.data.content.data;
-                this.pagination = res.data.content;
-                console.log(res.data.content);
-             })
-             .catch((error) => {
-                console.log(error);
-             })
-             .finally(() => {    
-                loader.hide();             
-             });
-       }
+            },
+            search_query: '',
+            search_field: '',
+            all_fields: ['id', 'vendor_id', 'subject', 'quotation_date'] 
+        }
     },
     mounted() {
-       this.getUsers()
-    }
-  }
+        this.getQuotations()
+    },
+    watch: {
+        search_query: function(new_search_key, old_search_key) {
+            if (new_search_key === '' ) {
+                if (this.search_field === '') {
+                  this.search_field = this.all_fields;
+                }
+                this.pagination.current_page = '';
+                this.getQuotations();
+            } else {
+                this.search_field = this.all_fields;
+                this.getQuotations();
+            }
+        },
+        search_field: function() {
+            this.pagination.current_page = '';
+            this.getQuotations();           
+        }
+    },
+    filters: {  
+      subStr: function(string) {
+        return string.substring(0, 45) + '...';
+      }  
+    },
+    methods: {
+        getQuotations() {console.log(this.pagination.current_page);
+            const loader = this.$loading.show({
+                container: this.$refs.attendanceTable,
+                canCancel: true,
+                loader: 'bars'
+            })
+            let url = encodeURI('quotations?page=' + this.pagination.current_page+'&search_field='+this.search_field+'&search_query='+this.search_query);
+            axios.get(url)
+                .then((res) => {
+                    this.quotations = res.data.content.data;
+                    this.pagination = res.data.content;
+                    console.log(res.data.content);
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
+                .finally(() => {
+                    loader.hide();
+                });
+        },
+
+        searchData() {
+            axios.get('quotations/'+this.queryField+'/'+this.query+'?page='+this.pagination.current_page)
+             .then(response => {
+                    this.buyers = response.data.data;
+                    this.pagination = response.data.meta;        
+                })
+                .catch(e => {
+                    console.log(e);
+                })
+        },
+
+        deleteQuotation(quotationId) {
+           // this.$snotify.clear();
+            this.$snotify.confirm(
+                "Are you sure to delete this?",
+                {
+                    closeOnClick: false,
+                    pauseOnHover: true,
+                    buttons: [
+                        {
+                            text: "Yes",
+                            action: toast => {
+                                this.$snotify.remove(toast.id);
+                                axios.delete('/quotations/'+quotationId)
+                                    .then(response => {
+                                        this.getQuotations();
+                                        this.$snotify.success('Successfully deleted', 'Success');
+                                    })
+                                    .catch(e => {
+                                        this.$snotify.success('Successfully deleted', 'Success');
+                                    })                               
+                            },
+                            bold: true
+                        },
+                        {
+                            text: "No",
+                            action: toast => {
+                                this.$snotify.remove(toast.id);
+                            },
+                            bold: true
+                        }
+                    ]
+                }
+            );
+        }
+    },
+    
+}
 </script>

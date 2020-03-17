@@ -48,8 +48,8 @@
                               <td>{{ user.screen_name }}</td>
                               <td>{{ user.role.name }}</td>
                               <td>
-                                <button type="button" class="btn btn-success btn-xs" @click="edit(user)"><i class="fas fa-edit"></i></button>
-                                <button type="button" class="btn btn-danger btn-xs " @click="destroy(user.id)"><i class="fas fa-times"></i></button>
+                                <button type="button" class="btn btn-success btn-xs" @click="edit(user)"><i class="fas fa fa-edit"></i></button>
+                                <button type="button" class="btn btn-danger btn-xs " @click="destroy(user.id)"><i class="fas fa fa-times"></i></button>
                               </td>                              
                             </tr>
                             <tr v-else>

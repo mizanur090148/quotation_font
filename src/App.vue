@@ -91,9 +91,11 @@ export default {
 @import "./assets/icons/themify-icons/themify-icons.css";
 @import "./assets/icons/material-design-iconic-font/css/materialdesignicons.min.css";
 @import "~vue-snotify/styles/material.css";
+@import "~vue-select/src/scss/vue-select.scss";
 
 @import "./assets/css/helper.css";
 @import "./assets/css/style.css";
+@import "./assets/css/custom.css";
 
   .card-header{
     margin: -20px -20px 20px -20px;
