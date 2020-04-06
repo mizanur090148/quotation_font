@@ -35,6 +35,7 @@ const LineMapsPage = resolve => { require.ensure(['../components/maps/line-maps/
 const Login = resolve => { require.ensure(['../components/auth/Login.vue'], ()=>{ resolve(require('../components/auth/Login.vue')); }); };
 const QuotationList = resolve => { require.ensure(['../components/QuotationList.vue'], ()=>{ resolve(require('../components/QuotationList.vue')); }); };
 const QuotationCreateForm = resolve => { require.ensure(['../components/QuotationCreateForm.vue'], ()=>{ resolve(require('../components/QuotationCreateForm.vue')); }); };
+const QuotationView = resolve => { require.ensure(['../components/quotations/QuotationView.vue'], ()=>{ resolve(require('../components/quotations/QuotationView.vue')); }); };
 
 const UserList = resolve => { require.ensure(['../components/UserList.vue'], ()=>{ resolve(require('../components/UserList.vue')); }); };
 const UserCreateForm = resolve => { require.ensure(['../components/UserCreateForm.vue'], ()=>{ resolve(require('../components/UserCreateForm.vue')); }); };
@@ -83,6 +84,10 @@ export const routes = [
     { 
         path : '/quotation-create',    
         component: QuotationCreateForm 
+    },
+    { 
+        path: '/view-quotation/:id',    
+        component: QuotationView
     },
     { path : '/components/alerts', name: 'alerts', component: Alerts },
     { path : '/components/calendar', name: 'calendar', component: Calendar },

@@ -41,14 +41,28 @@
                             <tr v-for="(quotation, index) in quotations" :key="quotation.id">
                                 <td>{{ ++index }}</td>
                                 <td>{{ quotation.id }}</td>
-                                <td>{{ quotation.vendor.vendor_name }} Mr Amish</td>
+                                <td>{{ quotation.vendor.vendor_name }}</td>
                                 <td :title="quotation.subject">{{ quotation.subject | subStr }}</td>
                                 <td>{{ quotation.quotation_date }}</td>                               
                                 <td>{{ quotation.total_discount }}</td>
                                 <td>{{ quotation.total_without_discount }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-success btn-xs" @click="edit(quotation)"><i class="fas fa fa-edit"></i></button>
-                                    <button type="button" class="btn btn-danger btn-xs " @click="deleteQuotation(quotation.id)"><i class="fas fa fa-times"></i></button>
+                                    <!-- <router-link
+                                       :to="'/view-quotation?qid=' + quotation.id"
+                                       class="btn btn-primary btn-xs"
+                                       title="View details">
+                                        <i class="fas fa fa-eye"/>
+                                    </router-link> -->
+                                    <router-link
+                                       :to="'/view-quotation/'+ quotation.id"
+                                       class="btn btn-primary btn-xs"
+                                       title="View details">
+                                        <i class="fas fa fa-eye"/>
+                                    </router-link>                                                          
+                                    <button type="button" class="btn btn-success btn-xs" @click="edit(quotation)" title="Edit">
+                                        <i class="fas fa fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-xs " @click="deleteQuotation(quotation.id)" title="Delete"><i class="fas fa fa-times"></i></button>
                                 </td>
                             </tr>
                         </tbody>
@@ -87,17 +101,16 @@ import "vue-loading-overlay/dist/vue-loading.css";
 import Loading from 'vue-loading-overlay';
 
 export default {
+
     data() {
-        return {
-            listResponse: null,
+        return {         
             quotations: [],
             pagination: {
-                current_page: 1,
-
+                current_page: 1
             },
             search_query: '',
             search_field: '',
-            all_fields: ['id', 'vendor_id', 'subject', 'quotation_date'] 
+            all_fields: ['id', 'vendors.vendor_name', 'subject', 'quotation_date'] 
         }
     },
     mounted() {
@@ -105,20 +118,21 @@ export default {
     },
     watch: {
         search_query: function(new_search_key, old_search_key) {
+            this.pagination.current_page = '';
             if (new_search_key === '' ) {
                 if (this.search_field === '') {
                   this.search_field = this.all_fields;
                 }
                 this.pagination.current_page = '';
-                this.getQuotations();
+                this.searchQuotations();
             } else {
                 this.search_field = this.all_fields;
-                this.getQuotations();
+                this.searchQuotations();
             }
         },
         search_field: function() {
             this.pagination.current_page = '';
-            this.getQuotations();           
+            this.searchQuotations();           
         }
     },
     filters: {  
@@ -127,13 +141,16 @@ export default {
       }  
     },
     methods: {
-        getQuotations() {console.log(this.pagination.current_page);
+        getQuotations() {
             const loader = this.$loading.show({
                 container: this.$refs.attendanceTable,
                 canCancel: true,
                 loader: 'bars'
             })
-            let url = encodeURI('quotations?page=' + this.pagination.current_page+'&search_field='+this.search_field+'&search_query='+this.search_query);
+            let url = encodeURI('quotations?page=' 
+                + this.pagination.current_page
+                +'&search_field='+this.search_field
+                +'&search_query='+this.search_query);
             axios.get(url)
                 .then((res) => {
                     this.quotations = res.data.content.data;
@@ -148,8 +165,9 @@ export default {
                 });
         },
 
-        searchData() {
-            axios.get('quotations/'+this.queryField+'/'+this.query+'?page='+this.pagination.current_page)
+        searchQuotations() {
+            let url = encodeURI('search-quotations?page='+this.pagination.current_page+'&search_field='+this.search_field+'&search_query='+this.search_query);
+            axios.get(url)
              .then(response => {
                     this.buyers = response.data.data;
                     this.pagination = response.data.meta;        

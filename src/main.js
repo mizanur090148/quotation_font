@@ -10,8 +10,6 @@ import Loading from 'vue-loading-overlay';
 import VuePagination from "./components/common/PaginationComponent";
 import VModal from 'vue-js-modal';
 import vSelect from "vue-select";
- 
-
 
 window.Form = Form
 
@@ -35,7 +33,7 @@ const router = new VueRouter({
     routes,
     linkActiveClass: 'open active',
     scrollBehavior: () => ({ y: 0 }),
-    mode: 'history'
+    mode: 'hash'
 });
 
 new Vue({
