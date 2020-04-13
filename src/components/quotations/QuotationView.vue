@@ -6,12 +6,10 @@
                 <div class="card-body card-block" ref="quotationContainer">                    
                     <div class="row">
                         <div class="col-4">
-                            <div class="form-group">
-                                <label for="role" class="form-control-label font-weight-bold">To</label>
-                                <div class="input-group">
-                                    {{ quotation.vendor.vendor_name }}
-                                </div>    
-                            </div>
+                            <span>To</span><br/>
+                            <span>{{ vendor.vendor_name  }}</span><br/>
+                            <span>{{ vendor.attention_designation }}</span><br/>
+                            <span>{{ vendor.address }}</span><br/><br/>
                         </div>
                         <div class="col-4"></div>
                         <div class="col-4">
@@ -59,7 +57,7 @@
                                 <tr class="font-weight-bold">
                                     <td colspan="3" class="text-right">Total</td>
                                     <td>
-                                        {{' quotation.quotation_total '}}
+                                        {{ quotation.quotation_total }}
                                     </td>
                                 </tr>
                                 <tr class="font-weight-bold">
@@ -70,7 +68,7 @@
                                     <td colspan="3" class="text-right capitalize">
                                         {{ require('number-to-words').toWords(quotation.total_without_discount) }} only
                                     </td>
-                                    <td></td>
+                                    <td>{{ quotation.total_without_discount }}</td>
                                 </tr>
                             </tbody>
                         </table>                                                          
@@ -126,7 +124,8 @@
         data() {
             return {
                 quotation: null,
-                quotation_items: null            
+                quotation_items: null,
+                vendor: null
             }
         }, 
         mounted() {
@@ -138,6 +137,7 @@
                     .then((res) => {
                         this.quotation = res.data.content;
                         this.quotation_items = this.quotation.quotation_details; 
+                        this.vendor = this.quotation.vendor; 
                         console.log(res.data.content);
                     })
                     .catch((error) => {

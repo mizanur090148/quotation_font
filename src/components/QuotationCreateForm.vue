@@ -91,7 +91,7 @@
                                         <td><input class="form-control text-right" type="number" v-model="total_without_discount" readonly/></td>
                                     </tr>
                                 </tbody>
-                            </table>                                                          
+                            </table>                                                         
                         </div><br/>                        
                         <div class="form-group row m-t-md">
                             <div class="col-sm-offset-4 col-sm-12 text-center">
