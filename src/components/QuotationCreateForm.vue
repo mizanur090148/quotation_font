@@ -4,7 +4,116 @@
             <div class="card">
                 <div class="card-header font-weight-bold">Create New Quotation</div>
                 <div class="card-body card-block" ref="quotationContainer">
-                    <form @submit.prevent="editMode ? update() : quotationStore()">
+                    <nav>
+                      <div class="nav nav-tabs font-weight-bold" id="nav-tab" role="tablist">
+                        <a class="nav-link" @click.prevent="setActive('home')" :class="{ active: isActive('home') }" href="#home">Quotation</a>
+                        <a class="nav-link" @click.prevent="setActive('including-services')" :class="{ active: isActive('including-services') }" href="#including-services">including-services</a>
+                        <a class="nav-link" @click.prevent="setActive('terms-and-conditions')" :class="{ active: isActive('terms-and-conditions') }" href="#terms-and-conditions">Terms & Conditions</a>
+                      </div>
+                    </nav>
+                    <div class="tab-content py-3" id="myTabContent">
+                        <div class="tab-pane fade" :class="{ 'active show': isActive('home') }" id="home">
+                            <form @submit.prevent="editMode ? update() : quotationStore()">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div class="form-group">
+                                            <label for="role" class="form-control-label font-weight-bold">To</label>
+                                            <div class="input-group">
+                                                <select v-model="form.vendor_id" id="selectLg" class="form-control-lg form-control" :class="{ 'is-invalid': errors.vendor_id }">
+                                                    <option value="">Please a select vendor</option>
+                                                    <option v-for="vendor in vendors" :value="vendor.id">{{ vendor.vendor_name }}</option>
+                                                </select>
+                                                <div class="input-group-btn">
+                                                    <div class="btn-group">
+                                                        <button type="button" class="form-control" @click="vendorCreateForm()">
+                                                            <i class="fa fa-plus-circle text-primary fa-lg"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>                                        
+                                            </div>
+                                            <div class="v-error" v-if="errors.vendor_id">{{ errors.vendor_id[0] }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4"></div>
+                                    <div class="col-4">
+                                        <div class="form-group">
+                                            <label for="last-name" class="form-control-label font-weight-bold">Quotation Date</label>
+                                            <input type="date" v-model="form.quotation_date" class="form-control" placeholder="Enter quotation date" :class="{ 'is-invalid': errors.quotation_date }"><div class="v-error" v-if="errors.quotation_date">{{ errors.quotation_date[0] }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="subject" class="form-control-label font-weight-bold">Subject</label>
+                                            <input type="text" v-model="form.subject" class="form-control" placeholder="Enter quotation subject" :class="{ 'is-invalid': errors.subject }"/><div class="v-error" v-if="errors.subject">{{ errors.subject[0] }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-success quotation-headline"> Services Description As Following Detail</button>
+                               
+                                <div class="row">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th width="5%">No</th>
+                                                <th width="40%"> &nbsp;&nbsp; Job Description</th>
+                                                <th width="10%">Quantity</th>
+                                                <th width="15%">Service Price Per Year</th>
+                                                <th width="10%">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(item, index) in form.quotation_items" :key="index">
+                                                <td class="text-center">
+                                                    {{ ++index }}
+                                                </td>
+                                                <td>
+                                                    <input type="text" v-model="item.job_description" class="form-control" placeholder="Enter job description" :class="{ 'is-invalid': errors.job_description }"/><div class="v-error" v-if="errors.job_description">{{ errors.job_description[0] }}</div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="number" v-model="item.quantity" min="0" class="form-control text-right" placeholder="Enter quantity" :class="{ 'is-invalid': errors.quantity }"/><div class="v-error" v-if="errors.quantity">{{ errors.quantity[0] }}</div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="number" v-model="item.service_per_year" min="0" class="form-control text-right" placeholder="Enter service per year" :class="{ 'is-invalid': errors.service_per_year }"/><div class="v-error" v-if="errors.service_per_year">{{ errors.service_per_year[0] }}</div>
+                                                </td>                                       
+                                                <td class="text-center">
+                                                    <button type='button' class="btn btn-xs btn-success" @click="addNewRow">
+                                                        <i class="fas fa fa-plus"></i>
+                                                        Add
+                                                    </button>         
+                                                    <button type="button" class="btn btn-xs btn-danger" @click="deleteRow(index, item)"><i class="fas fa fa-times"></i> Delete</button>
+                                                </td>
+                                            </tr>
+                                            <tr class="font-weight-bold">
+                                                <td colspan="3" class="text-right">Total</td>
+                                                <td>
+                                                    <input type="number" v-model="quotation_total" class="form-control text-right" placeholder="Enter service per year" readonly/>
+                                                </td>
+                                            </tr>
+                                            <tr class="font-weight-bold">
+                                                <td colspan="3" class="text-right">Total Discount</td>
+                                                <td><input type="number" class="form-control text-right" min="0" v-model="form.total_discount"/></td>
+                                            </tr>
+                                            <tr class="font-weight-bold">
+                                                <td colspan="3" class="text-right capitalize">{{ require('number-to-words').toWords(total_without_discount) }} only</td>
+                                                <td><input class="form-control text-right" type="number" v-model="total_without_discount" readonly/></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>                                                         
+                                </div><br/>
+                                <div class="form-group row m-t-md">
+                                    <div class="col-sm-offset-4 col-sm-12 text-center">
+                                        <button type="submit" class="btn btn-info btn-rounded m-b-10 m-l-5">Submit</button>
+                                        <button @click="reset()" type="button" class="btn btn-danger btn-rounded m-b-10 m-l-5">Reset</button>
+                                    </div>
+                                </div> 
+                            </form>
+                        </div>
+                        <div class="tab-pane fade" :class="{ 'active show': isActive('including-services') }" id="including-services">Including services content</div>
+                        <div class="tab-pane fade" :class="{ 'active show': isActive('terms-and-conditions') }" id="terms-and-conditions">terms-and-conditions content</div>
+                    </div>
+                <!-- <form @submit.prevent="editMode ? update() : quotationStore()">
                         <div class="row">
                             <div class="col-4">
                                 <div class="form-group">
@@ -99,7 +208,7 @@
                                 <button @click="reset()" type="button" class="btn btn-danger btn-rounded m-b-10 m-l-5">Reset</button>
                             </div>
                         </div> 
-                    </form>
+                     </form> -->
                 </div>
             </div>
         </div>       
@@ -236,14 +345,14 @@
     import "vue-loading-overlay/dist/vue-loading.css";
     import Loading from 'vue-loading-overlay';
 
-    export default {       
-        components: {      
+    export default {
+        components: {
             Loading
         },
 
         data: function () {
           return {
-            editMode: false,
+            activeItem: 'home',
             query: '',
             queryField: 'name',
             users: [],
@@ -312,6 +421,13 @@
         },
       
         methods: {
+            
+            isActive (menuItem) {
+              return this.activeItem === menuItem
+            },
+            setActive (menuItem) {
+              this.activeItem = menuItem
+            },
             /*********vendor table area*****/
             getVendors() {
                 axios.get('/vendors')
